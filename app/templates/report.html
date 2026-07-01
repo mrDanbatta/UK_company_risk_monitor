@@ -1,0 +1,30 @@
+{% if error %}
+<div class="error">{{ error }}</div>
+{% else %}
+<article class="report">
+    <h2>Risk report: {{ report.company_number }}</h2>
+    <p class="score">Overall risk score: <strong>{{ report.overall_score }}</strong> / 100</p>
+    <p>Confidence: {{ (report.confidence * 100) | round | int }}%</p>
+
+    <h3>Category breakdown</h3>
+    <ul>
+        {% for category, score in report.category_breakdown.items() %}
+        <li>{{ category | capitalize }}: {{ score }} / 100</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Findings</h3>
+    {% if report.findings %}
+    <ul>
+        {% for finding in report.findings %}
+        <li>
+            <strong>{{ finding.category | capitalize }}:</strong> {{ finding.summary }}
+            <br><small>{{ finding.citation }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No specific findings reported.</p>
+    {% endif %}
+</article>
+{% endif %}

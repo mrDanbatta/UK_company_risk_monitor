@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "type": "AA",
+      "category": "accounts",
+      "date": "2025-06-10",
+      "description": "accounts-with-accounts-type-small"
+    },
+    {
+      "type": "CS01",
+      "category": "confirmation-statement",
+      "date": "2025-03-28",
+      "description": "confirmation-statement-with-updates"
+    },
+    {
+      "type": "MR01",
+      "category": "mortgage",
+      "date": "2024-11-02",
+      "description": "mortgage-charge-created"
+    }
+  ],
+  "total_count": 3
+}

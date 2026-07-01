@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "name": "SMITH, Jane",
+      "officer_role": "director",
+      "appointed_on": "2018-03-14",
+      "nationality": "British",
+      "occupation": "Dentist",
+      "country_of_residence": "United Kingdom"
+    },
+    {
+      "name": "DOE, John",
+      "officer_role": "director",
+      "appointed_on": "2020-07-01",
+      "resigned_on": "2025-11-20",
+      "nationality": "British",
+      "occupation": "Company Director",
+      "country_of_residence": "United Kingdom"
+    }
+  ],
+  "active_count": 1,
+  "resigned_count": 1
+}

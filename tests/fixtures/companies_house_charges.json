@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "charge_number": "1",
+      "classification": {"description": "A registered charge"},
+      "status": "outstanding",
+      "delivered_on": "2024-11-02",
+      "persons_entitled": [{"name": "Example Bank plc"}]
+    }
+  ],
+  "total_count": 1,
+  "unfiltered_count": 1,
+  "satisfied_count": 0
+}
