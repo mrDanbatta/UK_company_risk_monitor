@@ -17,21 +17,13 @@ async def get_or_refresh_company(
 ) -> Company:
     """Return cached company data if it's fresh enough, otherwise pull a
     full fresh set from Companies House and upsert it.
-
-    This is the only place that should call the six CH connector methods
-    together — everything else (scoring, the agent) reads from this cached
-    row, so a burst of report requests doesn't multiply into a burst of
-    API calls against a 600-req/5-min limit.
     """
     company = await session.get(Company, company_number)
 
-    is_stale = company is None or (
-        datetime.now(UTC) - company.last_fetched_at.replace(tzinfo=UTC)
-        > max_age
-    )
-
-    if not is_stale:
-        return company
+    if company is not None:
+        is_fresh = datetime.now(UTC) - company.last_fetched_at.replace(tzinfo=UTC) <= max_age
+        if is_fresh:
+            return company
 
     profile = await ch_client.get_company_profile(company_number)
     officers = await ch_client.get_officers(company_number)
@@ -57,6 +49,5 @@ async def get_or_refresh_company(
 
 
 async def list_cached_companies(session: AsyncSession) -> list[Company]:
-    """Used by the dashboard's recent-searches view."""
     result = await session.execute(select(Company).order_by(Company.last_fetched_at.desc()))
     return list(result.scalars().all())

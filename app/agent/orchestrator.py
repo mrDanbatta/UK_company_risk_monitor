@@ -1,11 +1,7 @@
-"""Agent orchestrator: the tool-calling loop that drives risk analysis.
-
-Flow: send the company number to Claude with the tool schemas -> Claude
-requests a tool -> we execute it against Companies House -> feed the
-result back -> repeat until Claude calls submit_report.
-"""
+"""Agent orchestrator: the tool-calling loop that drives risk analysis."""
 
 from dataclasses import dataclass
+from typing import Any, cast
 
 from anthropic import AsyncAnthropic
 
@@ -14,7 +10,7 @@ from app.agent.tools import TOOL_SCHEMAS, dispatch_tool_call
 from app.connectors.companies_house import CompaniesHouseClient
 
 MODEL = "claude-sonnet-4-6"
-MAX_TURNS = 8  # safety cap so a confused agent can't loop forever
+MAX_TURNS = 8
 
 
 @dataclass(frozen=True)
@@ -23,7 +19,7 @@ class AgentReport:
     category_breakdown: dict
     findings: list[dict]
     confidence: float
-    tool_calls_made: int  # useful for logging/debugging, not part of the schema
+    tool_calls_made: int
 
 
 class AgentDidNotSubmitReportError(Exception):
@@ -35,7 +31,11 @@ async def run_risk_analysis(
     ch_client: CompaniesHouseClient,
     company_number: str,
 ) -> AgentReport:
-    messages = [
+    # Explicitly Any-typed: this list holds a mix of plain user turns,
+    # assistant blocks straight from the SDK, and our own tool_result
+    # dicts. The Anthropic SDK's real MessageParam type is far more
+    # precise than we need to hand-replicate here.
+    messages: list[dict[str, Any]] = [
         {
             "role": "user",
             "content": f"Analyze company number {company_number} and produce a risk report.",
@@ -49,8 +49,8 @@ async def run_risk_analysis(
             model=MODEL,
             max_tokens=2048,
             system=SYSTEM_PROMPT,
-            tools=TOOL_SCHEMAS,
-            messages=messages,
+            tools=TOOL_SCHEMAS,  # type: ignore[arg-type]
+            messages=messages,  # type: ignore[arg-type]
         )
 
         messages.append({"role": "assistant", "content": response.content})
@@ -58,8 +58,6 @@ async def run_risk_analysis(
         tool_use_blocks = [b for b in response.content if b.type == "tool_use"]
 
         if not tool_use_blocks:
-            # Claude replied with only text and no tool call — nudge it,
-            # rather than silently failing the analysis.
             messages.append(
                 {
                     "role": "user",
@@ -69,16 +67,16 @@ async def run_risk_analysis(
             )
             continue
 
-        tool_results = []
+        tool_results: list[dict[str, Any]] = []
         submitted_report: AgentReport | None = None
 
         for block in tool_use_blocks:
             if block.name == "submit_report":
                 submitted_report = AgentReport(
-                    overall_score=block.input["overall_score"],
-                    category_breakdown=block.input["category_breakdown"],
-                    findings=block.input["findings"],
-                    confidence=block.input["confidence"],
+                    overall_score=cast(int, block.input["overall_score"]),
+                    category_breakdown=cast(dict, block.input["category_breakdown"]),
+                    findings=cast(list, block.input["findings"]),
+                    confidence=cast(float, block.input["confidence"]),
                     tool_calls_made=tool_calls_made,
                 )
                 tool_results.append(
@@ -101,8 +99,6 @@ async def run_risk_analysis(
                     }
                 )
             except Exception as e:
-                # Surface the error to Claude rather than crashing the
-                # whole analysis — it can adapt (e.g. skip that data source).
                 tool_results.append(
                     {
                         "type": "tool_result",
