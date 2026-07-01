@@ -10,6 +10,7 @@ from app.services.analysis import perform_analysis
 
 router = APIRouter(prefix="/api/companies", tags=["companies"])
 
+
 @router.post("/{company_number}/analyze")
 async def analyze_company(
     company_number: str,

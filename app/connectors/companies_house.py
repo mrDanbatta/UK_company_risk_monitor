@@ -31,7 +31,7 @@ class RateLimitError(CompaniesHouseError):
     def __init__(self, retry_after: int | None = None) -> None:
         self.retry_after = retry_after
         super().__init__(
-            f"Companies House rate limit hit"
+            "Companies House rate limit hit"
             + (f", retry after {retry_after}s" if retry_after else "")
         )
 
@@ -51,7 +51,7 @@ class CompaniesHouseClient:
             timeout=timeout,
         )
 
-    async def __aenter__(self) -> "CompaniesHouseClient":
+    async def __aenter__(self) -> CompaniesHouseClient:
         return self
 
     async def __aexit__(self, *exc_info: object) -> None:

@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock, create_autospec
 import pytest
 
 from app.agent.orchestrator import (
-    AgentDidNotSubmitReportError,
     MAX_TURNS,
+    AgentDidNotSubmitReportError,
     run_risk_analysis,
 )
 from app.connectors.companies_house import CompaniesHouseClient, RateLimitError

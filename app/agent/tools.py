@@ -11,7 +11,10 @@ from app.connectors.companies_house import CompaniesHouseClient
 TOOL_SCHEMAS = [
     {
         "name": "get_company_profile",
-        "description": "Get core company details: status, incorporation date, SIC codes, registered office, accounts and confirmation statement due dates.",
+        "description": (
+            "Get core company details: status, incorporation date, SIC codes, "
+            "registered office, accounts and confirmation statement due dates."
+        ),
         "input_schema": {
             "type": "object",
             "properties": {"company_number": {"type": "string"}},
@@ -65,7 +68,10 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "submit_report",
-        "description": "Submit the final structured risk report. Call this once you have gathered enough evidence — it ends the analysis.",
+        "description": (
+            "Submit the final structured risk report. Call this once you have "
+            "gathered enough evidence — it ends the analysis."
+        ),
         "strict": True,
         "input_schema": {
             "type": "object",

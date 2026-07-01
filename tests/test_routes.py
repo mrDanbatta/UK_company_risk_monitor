@@ -6,7 +6,7 @@ shape, and error mapping, not the pipeline itself (that's covered by
 test_connectors.py, test_scoring.py, and test_agent.py).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -38,7 +38,7 @@ def make_fake_report(**overrides) -> RiskReport:
     defaults.update(overrides)
     report = RiskReport(**defaults)
     report.id = 1
-    report.created_at = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    report.created_at = datetime(2026, 6, 1, tzinfo=UTC)
     return report
 
 

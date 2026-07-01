@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +26,7 @@ async def get_or_refresh_company(
     company = await session.get(Company, company_number)
 
     is_stale = company is None or (
-        datetime.now(timezone.utc) - company.last_fetched_at.replace(tzinfo=timezone.utc)
+        datetime.now(UTC) - company.last_fetched_at.replace(tzinfo=UTC)
         > max_age
     )
 
