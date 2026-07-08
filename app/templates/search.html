@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<form hx-post="/analyze" hx-target="#report-container" hx-swap="innerHTML" hx-indicator="#loading">
+<form hx-post="/analyse" hx-target="#report-container" hx-swap="innerHTML" hx-indicator="#loading">
     <label for="company_number">Companies House number</label>
     <input type="text" id="company_number" name="company_number" placeholder="e.g. 00000006" required>
-    <button type="submit">Analyze</button>
+    <button type="submit">Analyse</button>
 </form>
 <div id="loading" class="htmx-indicator">Analyzing…</div>
 
@@ -11,7 +11,7 @@
 
 {% if recent_companies %}
 <section>
-    <h2>Recently analyzed</h2>
+    <h2>Recently analysed</h2>
     <ul>
         {% for company in recent_companies %}
         <li>{{ company.raw_profile.get('company_name', company.company_number) }} ({{ company.company_number }})</li>
