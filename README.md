@@ -10,6 +10,10 @@ layer to deterministic scoring.
 
 ---
 
+![Dashboard screenshot](docs/screenshot.png)
+
+---
+
 ## What it does
 
 Given a Companies House number, the system:
