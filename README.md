@@ -10,6 +10,7 @@ layer to deterministic scoring.
 
 ---
 
+![Dashboard screenshot](docs/screenshot.png)
 
 ---
 
