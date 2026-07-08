@@ -7,7 +7,7 @@ test_connectors.py, test_scoring.py, and test_agent.py).
 """
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -45,7 +45,7 @@ def make_fake_report(**overrides) -> RiskReport:
 @pytest.fixture
 def client():
     async def _fake_get_session():
-        yield MagicMock()
+        yield AsyncMock()
 
     app.dependency_overrides[get_session] = _fake_get_session
     with TestClient(app) as test_client:
