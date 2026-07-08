@@ -75,7 +75,7 @@ async def run_risk_analysis(
                 submitted_report = AgentReport(
                     overall_score=cast(int, block.input["overall_score"]),
                     category_breakdown=cast(dict, block.input["category_breakdown"]),
-                    findings=cast(list, block.input["findings"]),
+                    findings=cast(list, block.input.get("findings", [])),
                     confidence=cast(float, block.input["confidence"]),
                     tool_calls_made=tool_calls_made,
                 )

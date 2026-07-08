@@ -11,8 +11,8 @@ from app.services.analysis import perform_analysis
 router = APIRouter(prefix="/api/companies", tags=["companies"])
 
 
-@router.post("/{company_number}/analyze")
-async def analyze_company(
+@router.post("/{company_number}/analyse")
+async def analyse_company(
     company_number: str,
     session: AsyncSession = Depends(get_session),
 ) -> dict:

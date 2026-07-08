@@ -53,12 +53,12 @@ def client():
     app.dependency_overrides.clear()
 
 
-# ---- JSON API: /api/companies/{number}/analyze ----
+# ---- JSON API: /api/companies/{number}/analyse ----
 
-def test_analyze_api_success(client):
+def test_analyse_api_success(client):
     fake_report = make_fake_report()
     with patch("app.routes.companies.perform_analysis", new=AsyncMock(return_value=fake_report)):
-        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyze")
+        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyse")
 
     assert response.status_code == 200
     body = response.json()
@@ -69,33 +69,33 @@ def test_analyze_api_success(client):
     assert body["created_at"] == "2026-06-01T00:00:00+00:00"
 
 
-def test_analyze_api_company_not_found_returns_404(client):
+def test_analyse_api_company_not_found_returns_404(client):
     error = CompanyNotFoundError(COMPANY_NUMBER)
     with patch("app.routes.companies.perform_analysis", new=AsyncMock(side_effect=error)):
-        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyze")
+        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyse")
 
     assert response.status_code == 404
     assert COMPANY_NUMBER in response.json()["detail"]
 
 
-def test_analyze_api_rate_limit_returns_429(client):
+def test_analyse_api_rate_limit_returns_429(client):
     error = RateLimitError(retry_after=30)
     with patch("app.routes.companies.perform_analysis", new=AsyncMock(side_effect=error)):
-        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyze")
+        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyse")
 
     assert response.status_code == 429
     assert "30" in response.json()["detail"]
 
 
-def test_analyze_api_agent_failure_returns_502(client):
+def test_analyse_api_agent_failure_returns_502(client):
     error = AgentDidNotSubmitReportError("agent gave up")
     with patch("app.routes.companies.perform_analysis", new=AsyncMock(side_effect=error)):
-        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyze")
+        response = client.post(f"/api/companies/{COMPANY_NUMBER}/analyse")
 
     assert response.status_code == 502
 
 
-# ---- HTML dashboard: GET / and POST /analyze ----
+# ---- HTML dashboard: GET / and POST /analyse ----
 
 def test_search_page_renders(client):
     with patch("app.routes.dashboard.list_cached_companies", new=AsyncMock(return_value=[])):
@@ -106,10 +106,10 @@ def test_search_page_renders(client):
     assert 'name="company_number"' in response.text
 
 
-def test_dashboard_analyze_success_renders_report_fragment(client):
+def test_dashboard_analyse_success_renders_report_fragment(client):
     fake_report = make_fake_report(overall_score=60)
     with patch("app.routes.dashboard.perform_analysis", new=AsyncMock(return_value=fake_report)):
-        response = client.post("/analyze", data={"company_number": COMPANY_NUMBER})
+        response = client.post("/analyse", data={"company_number": COMPANY_NUMBER})
 
     assert response.status_code == 200
     assert COMPANY_NUMBER in response.text
@@ -118,18 +118,18 @@ def test_dashboard_analyze_success_renders_report_fragment(client):
     assert "<html" not in response.text.lower()
 
 
-def test_dashboard_analyze_not_found_renders_error_fragment(client):
+def test_dashboard_analyse_not_found_renders_error_fragment(client):
     error = CompanyNotFoundError(COMPANY_NUMBER)
     with patch("app.routes.dashboard.perform_analysis", new=AsyncMock(side_effect=error)):
-        response = client.post("/analyze", data={"company_number": COMPANY_NUMBER})
+        response = client.post("/analyse", data={"company_number": COMPANY_NUMBER})
 
     assert response.status_code == 404
     assert "No company found" in response.text
 
 
-def test_dashboard_analyze_missing_company_number_is_422(client):
+def test_dashboard_analyse_missing_company_number_is_422(client):
     # Form(...) is required -- omitting it entirely should fail validation,
     # not silently pass an empty string through to perform_analysis
-    response = client.post("/analyze", data={})
+    response = client.post("/analyse", data={})
 
     assert response.status_code == 422

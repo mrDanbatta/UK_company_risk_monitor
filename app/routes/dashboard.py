@@ -26,8 +26,8 @@ async def search_page(request: Request, session: AsyncSession = Depends(get_sess
     )
 
 
-@router.post("/analyze", response_class=HTMLResponse)
-async def analyze_and_render(
+@router.post("/analyse", response_class=HTMLResponse)
+async def analyse_and_render(
     request: Request,
     company_number: str = Form(...),
     session: AsyncSession = Depends(get_session),

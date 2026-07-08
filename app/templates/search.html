@@ -1,20 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
-<form hx-post="/analyse" hx-target="#report-container" hx-swap="innerHTML" hx-indicator="#loading">
-    <label for="company_number">Companies House number</label>
-    <input type="text" id="company_number" name="company_number" placeholder="e.g. 00000006" required>
-    <button type="submit">Analyse</button>
-</form>
-<div id="loading" class="htmx-indicator">Analyzing…</div>
+{% set risky_statuses = ["liquidation", "receivership", "administration", "voluntary-arrangement", "insolvency-proceedings"] %}
+
+<section class="card search-card">
+    <h2 class="section-title">Analyse a company</h2>
+    <p class="section-subtitle">Enter a Companies House number to generate a risk report from public filings.</p>
+    <form class="search-form" hx-post="/analyse" hx-target="#report-container" hx-swap="innerHTML" hx-indicator="#loading">
+        <div class="field">
+            <label for="company_number">Companies House number</label>
+            <input type="text" id="company_number" name="company_number" placeholder="e.g. 00000006" required>
+        </div>
+        <button type="submit">Analyse</button>
+    </form>
+    <div id="loading" class="htmx-indicator">
+        <span class="spinner" aria-hidden="true"></span> Analysing…
+    </div>
+</section>
 
 <div id="report-container"></div>
 
 {% if recent_companies %}
-<section>
-    <h2>Recently analysed</h2>
-    <ul>
+<section class="recent-section">
+    <h2 class="section-title">Recently analysed</h2>
+    <ul class="company-list">
         {% for company in recent_companies %}
-        <li>{{ company.raw_profile.get('company_name', company.company_number) }} ({{ company.company_number }})</li>
+        {% set status = company.raw_profile.get('company_status') %}
+        <li class="company-row">
+            <div class="company-row-main">
+                <span class="company-name">{{ company.raw_profile.get('company_name', company.company_number) }}</span>
+                <span class="company-number">{{ company.company_number }}</span>
+            </div>
+            {% if status %}
+            <span class="pill {{ 'risk-critical' if status in risky_statuses else ('risk-good' if status == 'active' else 'risk-warning') }}">
+                {{ status | replace('-', ' ') | capitalize }}
+            </span>
+            {% endif %}
+        </li>
         {% endfor %}
     </ul>
 </section>

@@ -2,16 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>UK Company Risk Monitor</title>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <header>
-        <h1>UK Company Risk Monitor</h1>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <span class="brand">UK Company Risk Monitor</span>
+            <span class="brand-tagline">Companies House filings, scored</span>
+        </div>
     </header>
     <main>
         {% block content %}{% endblock %}
     </main>
+    <footer class="site-footer">
+        Data sourced from Companies House public records.
+    </footer>
 </body>
 </html>

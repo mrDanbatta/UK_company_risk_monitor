@@ -1,30 +1,79 @@
+{% macro risk_class(score) -%}
+{%- if score >= 75 -%}risk-critical
+{%- elif score >= 50 -%}risk-serious
+{%- elif score >= 25 -%}risk-warning
+{%- else -%}risk-good
+{%- endif -%}
+{%- endmacro %}
+
+{% macro risk_label(score) -%}
+{%- if score >= 75 -%}Severe
+{%- elif score >= 50 -%}High
+{%- elif score >= 25 -%}Medium
+{%- else -%}Low
+{%- endif -%}
+{%- endmacro %}
+
 {% if error %}
-<div class="error">{{ error }}</div>
+<div class="card state-error">
+    <p class="state-error-title">Analysis failed</p>
+    <p class="state-error-message">{{ error }}</p>
+</div>
 {% else %}
-<article class="report">
-    <h2>Risk report: {{ report.company_number }}</h2>
-    <p class="score">Overall risk score: <strong>{{ report.overall_score }}</strong> / 100</p>
-    <p>Confidence: {{ (report.confidence * 100) | round | int }}%</p>
+<article class="report card">
+    <header class="report-header">
+        <div>
+            <p class="eyebrow">Risk report</p>
+            <h2>{{ report.company_number }}</h2>
+        </div>
+        <span class="pill confidence-pill">{{ (report.confidence * 100) | round | int }}% confidence</span>
+    </header>
 
-    <h3>Category breakdown</h3>
-    <ul>
-        {% for category, score in report.category_breakdown.items() %}
-        <li>{{ category | capitalize }}: {{ score }} / 100</li>
-        {% endfor %}
-    </ul>
+    <div class="score-block">
+        <div class="score-figure {{ risk_class(report.overall_score) }}">
+            <span class="score-value">{{ report.overall_score }}</span>
+            <span class="score-max">/ 100</span>
+        </div>
+        <div class="score-meta">
+            <span class="pill {{ risk_class(report.overall_score) }}">{{ risk_label(report.overall_score) }} risk</span>
+            <div class="meter meter-lg">
+                <div class="meter-fill {{ risk_class(report.overall_score) }}" style="width: {{ report.overall_score }}%"></div>
+            </div>
+        </div>
+    </div>
 
-    <h3>Findings</h3>
-    {% if report.findings %}
-    <ul>
-        {% for finding in report.findings %}
-        <li>
-            <strong>{{ finding.category | capitalize }}:</strong> {{ finding.summary }}
-            <br><small>{{ finding.citation }}</small>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No specific findings reported.</p>
-    {% endif %}
+    <section class="breakdown">
+        <h3>Category breakdown</h3>
+        <ul class="meter-list">
+            {% for category, score in report.category_breakdown.items() %}
+            <li class="meter-row">
+                <div class="meter-row-label">
+                    <span>{{ category | capitalize }}</span>
+                    <span class="meter-row-value {{ risk_class(score) }}">{{ score }}</span>
+                </div>
+                <div class="meter">
+                    <div class="meter-fill {{ risk_class(score) }}" style="width: {{ score }}%"></div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="findings">
+        <h3>Findings</h3>
+        {% if report.findings %}
+        <ul class="finding-list">
+            {% for finding in report.findings %}
+            <li class="finding">
+                <span class="finding-tag cat-{{ finding.category if finding.category in ['financial', 'compliance'] else 'default' }}">{{ finding.category | capitalize }}</span>
+                <p class="finding-summary">{{ finding.summary }}</p>
+                <p class="finding-citation">{{ finding.citation }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-note">No specific findings reported.</p>
+        {% endif %}
+    </section>
 </article>
 {% endif %}
