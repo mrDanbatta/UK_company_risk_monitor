@@ -312,6 +312,12 @@ button:active { filter: brightness(0.96); }
   font-size: 1.375rem;
 }
 
+.company-number-inline {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
 .score-block {
   display: flex;
   align-items: center;

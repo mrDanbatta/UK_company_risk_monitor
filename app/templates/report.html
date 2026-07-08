@@ -24,7 +24,11 @@
     <header class="report-header">
         <div>
             <p class="eyebrow">Risk report</p>
-            <h2>{{ report.company_number }}</h2>
+            <h2>
+                {% if company_name %}{{ company_name }} <span class="company-number-inline">{{ report.company_number }}</span>
+                {%- else %}{{ report.company_number }}
+                {%- endif %}
+            </h2>
         </div>
         <span class="pill confidence-pill">{{ (report.confidence * 100) | round | int }}% confidence</span>
     </header>

@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.agent.orchestrator import AgentDidNotSubmitReportError
 from app.connectors.companies_house import CompanyNotFoundError, RateLimitError
 from app.db import get_session
+from app.models.company import Company
 from app.services.analysis import perform_analysis
 from app.services.cache import list_cached_companies
 
@@ -58,8 +59,11 @@ async def analyse_and_render(
             status_code=502,
         )
 
+    company = await session.get(Company, company_number)
+    company_name = company.raw_profile.get("company_name") if company else None
+
     return templates.TemplateResponse(
         request=request,
         name="report.html",
-        context={"report": report},
+        context={"report": report, "company_name": company_name},
     )
